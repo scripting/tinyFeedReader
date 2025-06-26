@@ -148,7 +148,3 @@ function tinyFeedReader (userOptions) {
 		setInterval (everySecond, 1000); 
 		});
 	}
-
-
-
-
