@@ -1,0 +1,10 @@
+{
+	"name": "demo",
+	"description": "Test app for tinyFeedReader package.",
+	"version": "0.4.0",
+	"main": "demo.js",
+	"dependencies" : {
+		"reallysimple": "*",
+		"tinyfeedreader": "*"
+		}
+	}
