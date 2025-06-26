@@ -20,5 +20,5 @@ But you can download the code and do whatever you like. It's a good place to get
 
 ### What kinds of feeds?
 
-It uses the reallySimple package to read feeds which in turn uses the feedParser package, so we read the same feeds they do, which is a lot of them in all kinds of formats. But you will get a JavaScript object that flattens out all the differences. 
+It uses the <a href="https://github.com/scripting/reallysimple">reallySimple package</a> to read feeds which in turn uses the <a href="https://github.com/danmactough/node-feedparser">feedParser package</a>, so we read the same feeds they do, which is a lot of them in all kinds of formats. But you will get a JavaScript object that flattens out all the differences. 
 
