@@ -14,7 +14,7 @@ Specify at least these three properties of the options object, and then call tin
 
 ### What's in an item?
 
-``JSON
+```JSON
 
 {
 
@@ -30,7 +30,7 @@ Specify at least these three properties of the options object, and then call tin
 
 }
 
-``
+```
 
 ### New features?
 
