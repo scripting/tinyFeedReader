@@ -14,7 +14,9 @@ Specify at least these three properties of the options object, and then call tin
 
 ### What's in an item?
 
-```JSON{	"description": "The longest continuously updated <a href=\"http://scripting.com/rss.xml\">RSS feed</a> in the known universe.",	"pubDate": "2025-06-27T11:46:47.000Z",	"link": "http://scripting.com/2025/06/27.html#a114647",	"guid": "http://scripting.com/2025/06/27.html#a114647",	"permalink": "http://scripting.com/2025/06/27.html#a114647"	}```
+An example. Note this item does not have a title. 
+
+```JSON{"description": "The longest continuously updated <a href=\"http://scripting.com/rss.xml\">RSS feed</a> in the known universe.","pubDate": "2025-06-27T11:46:47.000Z","link": "http://scripting.com/2025/06/27.html#a114647","guid": "http://scripting.com/2025/06/27.html#a114647","permalink": "http://scripting.com/2025/06/27.html#a114647"}```
 
 ### New features?
 
