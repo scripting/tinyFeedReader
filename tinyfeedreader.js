@@ -21,13 +21,14 @@ function tinyFeedReader (userOptions) {
 	utils.mergeOptions (userOptions, options);
 	
 	var stats = {
+		ctStarts: 0, whenLastStart: new Date (0),
+		ctItemsSeen: 0, whenLastItem: new Date (0),
+		ctNewItems: 0, whenLastNewItem: new Date (0),
+		ctDeletedItems: 0, whenLastDeletedItem: new Date (0),
 		guids: new Object ()
 		};
 	
-	const fnameStats = "stats.json";
-	var flStatsChanged = false;
-	
-	var whenLastCheck = new Date (0);
+	var flStatsChanged = false, whenLastCheck = new Date (0);
 	
 	function nowString () {
 		return (new Date ().toLocaleTimeString ());
@@ -61,6 +62,7 @@ function tinyFeedReader (userOptions) {
 				}
 			if (oldestx !== undefined) {
 				delete stats.guids [oldestx];
+				stats.ctDeletedItems++; stats.whenLastDeletedItem = new Date ();
 				statsChanged ();
 				}
 			}
@@ -83,9 +85,8 @@ function tinyFeedReader (userOptions) {
 		return (flnew);
 		}
 	function checkFeed (feedUrl, callback) {
+		const now = new Date ();
 		const flNewFeed = isNewFeed (feedUrl);
-		var flPost = (flNewFeed && options.flOnlyPostNewItems) ? false : true;
-		console.log (nowString () + ": checkFeed: feedUrl == " + feedUrl);
 		reallysimple.readFeed (feedUrl, function (err, theFeed) {
 			if (err) {
 				callback (err);
@@ -105,10 +106,15 @@ function tinyFeedReader (userOptions) {
 								when: new Date (),
 								feedUrl
 								};
-							statsChanged ();
-							if (flPost) {
-								options.newItemCallback (feedUrl, item);
+							stats.ctItemsSeen++; stats.whenLastItem = now;
+							if (flNewFeed && options.flOnlyPostNewItems) {
+								 //don't add items from a newly-added feed
 								}
+							else {
+								options.newItemCallback (feedUrl, item);
+								stats.ctNewItems++; stats.whenLastNewItem = now;
+								}
+							statsChanged ();
 							}
 						}
 					});
@@ -140,11 +146,20 @@ function tinyFeedReader (userOptions) {
 				}
 			}
 		}
+	
+	console.log (nowString () + ": tinyFeedReader startup.")
 	utils.readConfig (options.fnameStats, stats, function (err) {
-		console.log (nowString () + ": tinyFeedReader starting up.")
-		checkAllFeeds (); //check immediately on startup, don't wait for the top of the minute
-		whenLastCheck = new Date (0); //make sure we check again at the top of the minute
-		utils.runEveryMinute (everyMinute);
-		setInterval (everySecond, 1000); 
+		if (err) {
+			console.log ("tinyFeedReader: Error reading " + options.fnameStats + " == " + err.message);
+			}
+		else {
+			stats.ctStarts++; stats.whenLastStart = new Date ();
+			checkAllFeeds (); //check immediately on startup, don't wait for the top of the minute
+			whenLastCheck = new Date (0); //make sure we check again at the top of the minute
+			utils.runEveryMinute (everyMinute);
+			setInterval (everySecond, 1000); 
+			}
 		});
 	}
+
+
