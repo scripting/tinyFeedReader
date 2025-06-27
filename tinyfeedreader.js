@@ -1,4 +1,4 @@
-const myProductName = "tinyFeedReader", myVersion = "0.4.2"; 
+const myProductName = "tinyFeedReader", myVersion = "0.4.6"; 
 
 exports.start = tinyFeedReader; 
 
@@ -11,7 +11,7 @@ function tinyFeedReader (userOptions) {
 		enabled: true,
 		feedUrls: new Array (),
 		secsBetwChecks: 60,
-		fnameStats: "stats.json",
+		fnameStats: "data/stats.json",
 		maxGuids: 2500, //we don't store the guids forever, after we have this number of guids, we start deleting the oldest ones
 		flOnlyPostNewItems: true,
 		newItemCallback: function (feedUrl, theItem) {
@@ -20,11 +20,15 @@ function tinyFeedReader (userOptions) {
 		}
 	utils.mergeOptions (userOptions, options);
 	
+	console.log ("\n" + nowString () + ": " + myProductName + " v" + myVersion + ". options == " + utils.jsonStringify (options))
+	
 	var stats = {
 		ctStarts: 0, whenLastStart: new Date (0),
 		ctItemsSeen: 0, whenLastItem: new Date (0),
 		ctNewItems: 0, whenLastNewItem: new Date (0),
 		ctDeletedItems: 0, whenLastDeletedItem: new Date (0),
+		ctSaves: 0, whenLastSave: new Date (0),
+		ctChecks: 0, whenLastCheck: new Date (0),
 		guids: new Object ()
 		};
 	
@@ -37,7 +41,20 @@ function tinyFeedReader (userOptions) {
 		flStatsChanged = true;
 		}
 	function writeStats () {
-		fs.writeFile (options.fnameStats, utils.jsonStringify (stats), function (err) {
+		utils.sureFilePath (options.fnameStats, function () {
+			var ct = 0;
+			for (var x in stats) {
+				ct++;
+				}
+			console.log ("\nwriteStats: " + ct + " top level items.\n");
+			
+			const jsontext = utils.jsonStringify (stats);
+			stats.ctSaves++; stats.whenLastSave = new Date ();
+			fs.writeFile (options.fnameStats, jsontext, function (err) {
+				if (err) {
+					console.log ("writeStats: err.message == " + err.message);
+					}
+				});
 			});
 		}
 	function deleteOldGuids () {
@@ -85,8 +102,10 @@ function tinyFeedReader (userOptions) {
 		return (flnew);
 		}
 	function checkFeed (feedUrl, callback) {
+		console.log (nowString () + ": checkFeed: feedUrl == " + feedUrl);
 		const now = new Date ();
 		const flNewFeed = isNewFeed (feedUrl);
+		stats.ctChecks++; stats.whenLastCheck = new Date (); statsChanged ();
 		reallysimple.readFeed (feedUrl, function (err, theFeed) {
 			if (err) {
 				callback (err);
@@ -123,6 +142,7 @@ function tinyFeedReader (userOptions) {
 		}
 	function checkAllFeeds () {
 		if (options.enabled) {
+			console.log ("\ncheckAllFeeds");
 			whenLastCheck = new Date ();
 			options.feedUrls.forEach (function (feedUrl) {
 				checkFeed (feedUrl, function (err, data) {
@@ -138,8 +158,6 @@ function tinyFeedReader (userOptions) {
 			flStatsChanged = false;
 			writeStats ();
 			}
-		}
-	function everyMinute () {
 		if (options.enabled) {
 			if (utils.secondsSince (whenLastCheck) >= options.secsBetwChecks) {
 				checkAllFeeds ();
@@ -147,16 +165,14 @@ function tinyFeedReader (userOptions) {
 			}
 		}
 	
-	console.log ("\n" + nowString () + ": " + myProductName + " v" + myVersion + " starting up.\n")
 	utils.readConfig (options.fnameStats, stats, function (err) {
 		if (err) {
 			console.log ("tinyFeedReader: Error reading " + options.fnameStats + " == " + err.message);
 			}
 		else {
-			stats.ctStarts++; stats.whenLastStart = new Date ();
 			checkAllFeeds (); //check immediately on startup, don't wait for the top of the minute
 			whenLastCheck = new Date (0); //make sure we check again at the top of the minute
-			utils.runEveryMinute (everyMinute);
+			stats.ctStarts++; stats.whenLastStart = new Date (); statsChanged ();
 			setInterval (everySecond, 1000); 
 			}
 		});
