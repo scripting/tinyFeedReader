@@ -1,8 +1,15 @@
 {
 	"name": "tinyfeedreader",
 	"description": "A minimal feed reader in a Node package.",
-	"version": "0.4.0",
+	"version": "0.4.2",
 	"main": "tinyfeedreader.js",
+	"files": [
+		"tinyfeedreader.js",
+		"worknotes.md",
+		"readme.md",
+		"demo/package.json",
+		"demo/demo.js"
+		],
 	"dependencies" : {
 		"daveutils": "*",
 		"reallysimple": "*"

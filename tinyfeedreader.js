@@ -1,4 +1,4 @@
-const myProductName = "tinyFeedReader", myVersion = "0.4.0"; 
+const myProductName = "tinyFeedReader", myVersion = "0.4.2"; 
 
 exports.start = tinyFeedReader; 
 
@@ -127,7 +127,7 @@ function tinyFeedReader (userOptions) {
 			options.feedUrls.forEach (function (feedUrl) {
 				checkFeed (feedUrl, function (err, data) {
 					if (err) {
-						console.log ("checkFeed: feedUrl == " +feedUrl + ", err.message == " + err.message);
+						console.log (nowString () + ": checkFeed: feedUrl == " +feedUrl + ", err.message == " + err.message);
 						}
 					});
 				});
@@ -147,7 +147,7 @@ function tinyFeedReader (userOptions) {
 			}
 		}
 	
-	console.log (nowString () + ": tinyFeedReader startup.")
+	console.log ("\n" + nowString () + ": " + myProductName + " v" + myVersion + " starting up.\n")
 	utils.readConfig (options.fnameStats, stats, function (err) {
 		if (err) {
 			console.log ("tinyFeedReader: Error reading " + options.fnameStats + " == " + err.message);
