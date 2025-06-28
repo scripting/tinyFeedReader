@@ -29,6 +29,7 @@ function tinyFeedReader (userOptions) {
 		ctDeletedItems: 0, whenLastDeletedItem: new Date (0),
 		ctSaves: 0, whenLastSave: new Date (0),
 		ctChecks: 0, whenLastCheck: new Date (0),
+		ctGuids: 0,
 		guids: new Object ()
 		};
 	
@@ -40,16 +41,17 @@ function tinyFeedReader (userOptions) {
 	function statsChanged () {
 		flStatsChanged = true;
 		}
+	function countGuids () {
+		var ct = 0;
+		for (var x in stats.guids) {
+			ct++
+			}
+		return (ct);
+		}
 	function writeStats () {
 		utils.sureFilePath (options.fnameStats, function () {
-			var ct = 0;
-			for (var x in stats) {
-				ct++;
-				}
-			console.log ("\nwriteStats: " + ct + " top level items.\n");
-			
 			const jsontext = utils.jsonStringify (stats);
-			stats.ctSaves++; stats.whenLastSave = new Date ();
+			stats.ctSaves++; stats.whenLastSave = new Date (); stats.ctGuids = countGuids ();
 			fs.writeFile (options.fnameStats, jsontext, function (err) {
 				if (err) {
 					console.log ("writeStats: err.message == " + err.message);
@@ -58,21 +60,14 @@ function tinyFeedReader (userOptions) {
 			});
 		}
 	function deleteOldGuids () {
-		function countGuids () {
-			var ct = 0;
-			for (var x in stats.guids) {
-				ct++
-				}
-			return (ct);
-			}
 		function deleteOldestGuid () {
 			var oldestWhen = new Date (), oldestx;
-			function dateLessThan (d1, d2) {
-				return (new Date (d1) < new Date (d2));
+			function dateLessThanOrEqual (d1, d2) {
+				return (new Date (d1).getTime () <= new Date (d2).getTime ());
 				}
 			for (var x in stats.guids) {
 				var theGuid = stats.guids [x];
-				if (dateLessThan (theGuid.when, oldestWhen)) {
+				if (dateLessThanOrEqual (theGuid.when, oldestWhen)) {
 					oldestWhen = theGuid.when;
 					oldestx = x;
 					}
@@ -102,7 +97,6 @@ function tinyFeedReader (userOptions) {
 		return (flnew);
 		}
 	function checkFeed (feedUrl, callback) {
-		console.log (nowString () + ": checkFeed: feedUrl == " + feedUrl);
 		const now = new Date ();
 		const flNewFeed = isNewFeed (feedUrl);
 		stats.ctChecks++; stats.whenLastCheck = new Date (); statsChanged ();
@@ -142,7 +136,7 @@ function tinyFeedReader (userOptions) {
 		}
 	function checkAllFeeds () {
 		if (options.enabled) {
-			console.log ("\ncheckAllFeeds");
+			deleteOldGuids ();
 			whenLastCheck = new Date ();
 			options.feedUrls.forEach (function (feedUrl) {
 				checkFeed (feedUrl, function (err, data) {
@@ -158,6 +152,8 @@ function tinyFeedReader (userOptions) {
 			flStatsChanged = false;
 			writeStats ();
 			}
+		}
+	function everyMinute () {
 		if (options.enabled) {
 			if (utils.secondsSince (whenLastCheck) >= options.secsBetwChecks) {
 				checkAllFeeds ();
@@ -172,6 +168,7 @@ function tinyFeedReader (userOptions) {
 		else {
 			checkAllFeeds (); //check immediately on startup, don't wait for the top of the minute
 			whenLastCheck = new Date (0); //make sure we check again at the top of the minute
+			utils.runEveryMinute (everyMinute);
 			stats.ctStarts++; stats.whenLastStart = new Date (); statsChanged ();
 			setInterval (everySecond, 1000); 
 			}
