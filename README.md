@@ -26,11 +26,11 @@ If an item doesn't have a guid, we can't deal with it, and will never return it 
 
 ### What's in an item?
 
-An example. Note this item does not have a title. 
-
 ```JSON{	"description": "The longest continuously updated <a href=\"http://scripting.com/rss.xml\">RSS feed</a> in the known universe.",	"pubDate": "2025-06-27T11:46:47.000Z",	"link": "http://scripting.com/2025/06/27.html#a114647",	"guid": "http://scripting.com/2025/06/27.html#a114647",	"permalink": "http://scripting.com/2025/06/27.html#a114647"	}```
 
 ### All data stored in memory
 
-We don't use a database, all the information about the items we've seen is stored in memory and saved to disk in a JSON file, stats.json. You can override the file path, by specifying its value in your options object, so you can store the stats file anywhere you like. 
+We don't use a database, all the information about the items we've seen is stored in memory and saved to disk in a JSON file, data/stats.json. 
+
+You can override the file path, by specifying its value in your options object, so you can store the stats file anywhere you like. 
 
