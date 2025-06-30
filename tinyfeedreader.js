@@ -1,4 +1,4 @@
-const myProductName = "tinyFeedReader", myVersion = "0.4.6"; 
+const myProductName = "tinyFeedReader", myVersion = "0.4.7"; 
 
 exports.start = tinyFeedReader; 
 

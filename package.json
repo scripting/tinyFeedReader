@@ -1,7 +1,7 @@
 {
 	"name": "tinyfeedreader",
 	"description": "A minimal feed reader in a Node package.",
-	"version": "0.4.6",
+	"version": "0.4.7",
 	"main": "tinyfeedreader.js",
 	"files": [
 		"tinyfeedreader.js",
